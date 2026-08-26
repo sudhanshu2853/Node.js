@@ -38,8 +38,17 @@ http.createServer((req, res) => {
             }
         })
     } else if (req.url === '/submit') {
+        let dataChunks=[];
+        req.on("data",(chunks)=>{
+            dataChunks.push(chunks);
+        });
+        req.on('end',()=>{
+            let rawData=Buffer.concat(dataChunks).toString('utf-8');
+            console.log(rawData);
+        });
+        
         res.writeHead(200, { 'Content-Type': 'text/html' })
-        res.end(`<body bgcolor='#030303'><center><h1 align='center' style='color:white;'>Form Submitted Successfully.</h1>
+        res.end(`<body bgcolor='#030303'><center><h1 align='center' style='color:white;'>Thank you ${rawData} Submitted Successfully.</h1>
             <a href='/'><button style='
             margin-top: 8px;
             padding: 12px;
