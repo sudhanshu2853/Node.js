@@ -49,6 +49,21 @@ http.createServer((req, res) => {
             let rawData = Buffer.concat(dataChunks).toString('utf-8');
             let readableData = queryString.parse(rawData);
             console.log(readableData);
+            let userInfo="{Name:"+readableData.name+", \n Email:"+readableData.email+"}";
+
+            //syncronous method to  create file where other process stops until file  created
+            // fs.writeFileSync('text/'+readableData.name+".txt",userInfo,'utf-8');
+            // console.log("File Created SuccessFully.")
+
+
+            //asynocronous method
+            fs.writeFile('text/'+readableData.name+".txt",userInfo,'utf-8',(err)=>{
+                if(!err){
+                    console.log('File Created Sucessfully');
+                }else{
+                    console.log('Internal Server Error');
+                }
+            });
 
 
             res.writeHead(200, { 'Content-Type': 'text/html' })
