@@ -16,6 +16,9 @@
 const http = require('http');
 const fs = require('fs');
 const port = 5200;
+const queryString = require('querystring');
+
+
 
 http.createServer((req, res) => {
     if (req.url === "/") {
@@ -37,18 +40,20 @@ http.createServer((req, res) => {
                 res.end();
             }
         })
-    } else if (req.url === '/submit') {
-        let dataChunks=[];
-        req.on("data",(chunks)=>{
+    } else if (req.url === '/submit' && req.method === 'POST') {
+        let dataChunks = [];
+        req.on("data", (chunks) => {
             dataChunks.push(chunks);
         });
-        req.on('end',()=>{
-            let rawData=Buffer.concat(dataChunks).toString('utf-8');
-            console.log(rawData);
-        });
-        
-        res.writeHead(200, { 'Content-Type': 'text/html' })
-        res.end(`<body bgcolor='#030303'><center><h1 align='center' style='color:white;'>Thank you ${rawData} Submitted Successfully.</h1>
+        req.on('end', () => {
+            let rawData = Buffer.concat(dataChunks).toString('utf-8');
+            let readableData = queryString.parse(rawData);
+            console.log(readableData);
+
+
+            res.writeHead(200, { 'Content-Type': 'text/html' })
+            res.end(`<body bgcolor='#030303'><center>
+            <h1 align='center' style='color:white;'>Thank you ${readableData.name || "User"} for contribution.</h1>
             <a href='/'><button style='
             margin-top: 8px;
             padding: 12px;
@@ -64,6 +69,7 @@ http.createServer((req, res) => {
             </center>
             </body>
             `);
+        });
 
     } else {
         fs.readFile('html/404.html', (err, data) => {
